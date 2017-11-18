@@ -146,6 +146,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HomeActivity.this, PostActivity.class);
+                intent.putExtra("Title", "USC");
                 startActivity(intent);
             }
         });

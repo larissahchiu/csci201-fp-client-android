@@ -25,6 +25,17 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
+        String name = SignupActivity.user.getName();
+        String title = getIntent().getExtras().getString("Title");
+        mPostUserLocationTextView = (TextView)findViewById(R.id.post_location_text_view);
+        mPostUserNameTextView = (TextView) findViewById(R.id.post_user_name_text_view);
+        mPostUserLocationTextView.setText(title);
+        mPostUserNameTextView.setText(name);
+
+
+
+
+
     }
 
 
