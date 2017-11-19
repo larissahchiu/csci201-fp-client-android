@@ -9,7 +9,7 @@ public class User implements Serializable {
     private String email;
     private String name;
     private String password;
-    private int score = 0;
+    private int score;
 
     public String getId() {
         return id;

@@ -50,7 +50,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="6dp"
-                android:text="USC"
                 android:textSize="20sp"/>
 
         </LinearLayout>
@@ -77,7 +76,6 @@
                 android:id="@+id/profile_post_caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="The Traveler is awesome!"
                 android:textColor="@android:color/black"
                 android:textSize="20dp"/>
 

@@ -28,6 +28,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import cs201.project.afinal.thetraveler.model.Place;
+
 
 public class ExploreFragment extends Fragment {
     private RequestQueue queue;
@@ -86,6 +88,17 @@ public class ExploreFragment extends Fragment {
                                                             DialogInterface dialog,
                                                             int id) {
                                                                 Intent intent = new Intent(getActivity(), PostActivity.class);
+                                                                for(int i = 0; i < response.length(); i++){
+                                                                   try{
+                                                                       JSONObject place = (JSONObject) response.get(i);
+                                                                       if(marker.getTitle().equals(place.get("name"))){
+                                                                           intent.putExtra("Title", new Place(place.getString("id"),place.getString("name"),
+                                                                                   place.getDouble("lat"), place.getDouble("lon"), place.getInt("points"), place.getInt("numVisits")));
+                                                                       }
+                                                                   }catch (JSONException e) {
+                                                                       e.printStackTrace();
+                                                                   }
+                                                                }
                                                                 intent.putExtra("Title", marker.getTitle());
                                                                 startActivity(intent);
                                                             }

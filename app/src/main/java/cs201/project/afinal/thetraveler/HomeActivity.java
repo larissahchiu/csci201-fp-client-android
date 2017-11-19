@@ -10,15 +10,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import cs201.project.afinal.thetraveler.model.User;
 
+
 public class HomeActivity extends AppCompatActivity {
 
-    public static User user;
     //members
     private ImageButton mHomeButton;
     private TextView mHomeTextView;
@@ -35,11 +36,17 @@ public class HomeActivity extends AppCompatActivity {
     private ImageButton mProfileButton;
     private TextView mProfileTextView;
 
+    public User homeUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e("HOME ACTIVITY", "Start");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        homeUser = (User) getIntent().getSerializableExtra("user");
+        Log.e("homeactivity", homeUser.getId());
+
 
         //show home if app just launched
         FragmentManager fm = getSupportFragmentManager();
@@ -47,7 +54,8 @@ public class HomeActivity extends AppCompatActivity {
 
         if (sampleFragment == null) {
             FragmentTransaction fragmentTransaction = fm.beginTransaction();
-            sampleFragment = HomeFragment.newInstance();
+            sampleFragment = HomeFragment.newInstance(this);
+
             fragmentTransaction.add(R.id.fragment_container, sampleFragment);
             fragmentTransaction.commit();
 
@@ -86,7 +94,10 @@ public class HomeActivity extends AppCompatActivity {
 
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft;
-                    HomeFragment fragment = HomeFragment.newInstance();
+                    HomeFragment fragment = HomeFragment.newInstance(HomeActivity.this);
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("homeUserName", homeUserName);
+//                    fragment.setArguments(bundle);
                     ft = fm.beginTransaction();
                     ft.replace(R.id.fragment_container, fragment);
                     ft.commit();
@@ -197,7 +208,7 @@ public class HomeActivity extends AppCompatActivity {
                 
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft;
-                ProfileFragment fragment = ProfileFragment.newInstance();
+                ProfileFragment fragment = ProfileFragment.newInstance(HomeActivity.this);
                 ft = fm.beginTransaction();
                 ft.replace(R.id.fragment_container, fragment);
                 ft.commit();
@@ -246,6 +257,8 @@ public class HomeActivity extends AppCompatActivity {
 
 
     }
+
+//
 
 
 }

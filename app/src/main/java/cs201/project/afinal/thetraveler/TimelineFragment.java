@@ -67,13 +67,6 @@ public class TimelineFragment extends Fragment {
 
         mTimelineList = (ListView) rootView.findViewById(R.id.timeline_list_view);
 
-        //dummy list
-//        ArrayList<Post> dummyList = new ArrayList<Post>();
-//        for(int i = 0; i < 10; i++) {
-//            Post post = new Post();
-//            dummyList.add(post);
-//        }
-
         allPosts = new ArrayList<Post>();
 
         //TODO set up Volley queue
@@ -168,9 +161,7 @@ public class TimelineFragment extends Fragment {
 
             //get current in arraylist
             Post post = getItem(position);
-            //Log.d("content", post.getPostContent());
-//            post.setPostContent(allPosts.get(0).getPostContent());
-//            //get references to widgets and set them to post's data
+
            TextView timelineCaption = (TextView) listViewItem.findViewById(R.id.timeline_post_caption);
            TextView userName = (TextView) listViewItem.findViewById(R.id.timeline_user_name_text_view);
             TextView placeName = (TextView) listViewItem.findViewById(R.id.timeline_location_text_view);

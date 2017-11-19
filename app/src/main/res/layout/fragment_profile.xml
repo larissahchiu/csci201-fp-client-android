@@ -46,6 +46,7 @@
             android:layout_marginTop="16dp">
 
             <TextView
+                android:id="@+id/profile_level"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="8dp"
@@ -53,10 +54,10 @@
 
             <ProgressBar
                 style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:id="@+id/profile_level_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
-                android:progress="50"
                 android:progressBackgroundTint="@android:color/darker_gray"
                 android:progressTint="#3498DB"/>
 
@@ -84,9 +85,9 @@
                     android:textColor="@android:color/white"/>
 
                 <TextView
+                    android:id="@+id/profile_places_visited"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10"
                     android:textColor="@android:color/white"
                     android:textSize="35dp"/>
 
@@ -107,9 +108,9 @@
                     android:textColor="@android:color/black"/>
 
                 <TextView
+                    android:id="@+id/profile_rank"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="25K"
                     android:textColor="@android:color/black"
                     android:textSize="35dp"/>
 

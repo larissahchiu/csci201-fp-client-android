@@ -19,6 +19,22 @@ public class Post implements Serializable {
     private int numImages;
     private boolean isPublic;
 
+
+    public Post(){
+
+    }
+    public Post(String id, Date timestamp, String userId, String userName, String placeId, String placeName, String postContent, int numImages, boolean isPublic) {
+        this.id = id;
+        this.timestamp = timestamp.getTime();
+        this.userId = userId;
+        this.userName = userName;
+        this.placeId = placeId;
+        this.placeName = placeName;
+        this.postContent = postContent;
+        this.numImages = numImages;
+        this.isPublic = isPublic;
+    }
+
     public String getId() {
         return id;
     }
