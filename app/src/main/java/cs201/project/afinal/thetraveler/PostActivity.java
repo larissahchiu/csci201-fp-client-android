@@ -2,10 +2,15 @@ package cs201.project.afinal.thetraveler;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -41,10 +47,13 @@ import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 
@@ -64,15 +73,18 @@ public class PostActivity extends AppCompatActivity {
     private ImageView mPostImage;
     private ImageButton mPostAddImage;
     private Button mPostButton;
-
+    private int PICK_IMAGE_REQUEST;
     private String placeUSC;
     private String idUSC;
     private RequestQueue queue;
+    private Bitmap bitmap;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.e("PostActivity", "made");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        final String uniqueID = UUID.randomUUID().toString();
 
         queue = Volley.newRequestQueue(this);
         User user = SignupActivity.user;
@@ -83,6 +95,8 @@ public class PostActivity extends AppCompatActivity {
         final String place = extras.getString("Title");
         placeUSC = "";
         idUSC = "";
+
+
 
         if(place.equals("USC")){
             Log.e("POSTACTIVITY", "choose location");
@@ -140,20 +154,6 @@ public class PostActivity extends AppCompatActivity {
                 }
             });
 
-//                    .setItems(placeNames, new DialogInterface.OnClickListener() {
-//
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            // The 'which' argument contains the index position
-//                            // of the selected item
-//
-//                            mPostUserLocationTextView = (TextView)findViewById(R.id.post_location_text_view);
-//                            mPostUserLocationTextView.setText(placeNames[which]);
-//                            placeUSC = placeNames[which];
-//                            idUSC = placeIds.get(which);
-//
-//
-//                        }
-//                    });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
 
@@ -176,6 +176,61 @@ public class PostActivity extends AppCompatActivity {
         final String name = user.getName();
 
 
+        PICK_IMAGE_REQUEST = 1;
+        Button Upload = (Button)findViewById(R.id.uploadButton);
+        Upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_PICK);
+                startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
+                
+                final ProgressDialog progressDialog = new ProgressDialog(PostActivity.this);
+                progressDialog.setMessage("Uploading, please wait...");
+                progressDialog.show();
+
+                //converting image to base64 string
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] imageBytes = baos.toByteArray();
+                final String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+                String URL = "http://10.0.2.2:8080/csci201-fp-server/rest/file/image/upload/post/" + uniqueID + "/index/1";
+                //sending image to server
+                StringRequest request = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>(){
+                    @Override
+                    public void onResponse(String s) {
+                        progressDialog.dismiss();
+                        if(s.equals("true")){
+                            Toast.makeText(PostActivity.this, "Uploaded Successful", Toast.LENGTH_LONG).show();
+                        }
+                        else{
+                            Toast.makeText(PostActivity.this, "Some error occurred!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },new Response.ErrorListener(){
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(PostActivity.this, "Some error occurred -> "+volleyError, Toast.LENGTH_LONG).show();;
+                    }
+                }) {
+                    //adding parameters to send
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> parameters = new HashMap<String, String>();
+                        parameters.put("image", imageString);
+                        return parameters;
+                    }
+                };
+
+               // RequestQueue rQueue = Volley.newRequestQueue(PostActivity.this);
+                queue.add(request);
+            }
+        });
+
+
         mPostButton = (Button) findViewById(R.id.post_button);
         mPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,10 +241,12 @@ public class PostActivity extends AppCompatActivity {
                 long currentTime = System.currentTimeMillis();
 
                 Post p;
-                String uniqueID = UUID.randomUUID().toString();
+
                 if(place.equals("USC"))
                 {
                     p = new Post(uniqueID, currentTime, userId, name, idUSC ,placeUSC, postContent, 0, true);
+
+
                 }
                 else{
                     String placeId = extras.getString("placeId");
@@ -219,6 +276,9 @@ public class PostActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             Log.i("VOLLEY", response);
+
+
+
                             PostActivity.super.onBackPressed();
                         }
                     }, new Response.ErrorListener() {
@@ -250,8 +310,6 @@ public class PostActivity extends AppCompatActivity {
 
 
 
-
-
             }
         });
 
@@ -259,4 +317,99 @@ public class PostActivity extends AppCompatActivity {
     }
 
 
-}
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        //onActivityResult(requestCode, resultCode, data);
+//        Log.e("Picture", "entered hello!r");
+//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+//            Log.e("Picture", "entered onActivityResult");
+//            Uri filePath = data.getData();
+//            try {
+//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+//                Bitmap lastBitmap = null;
+//                lastBitmap = bitmap;
+//                //encoding image to string
+//                String image = getStringImage(lastBitmap);
+//                Log.d("image",image);
+//                //passing the image to volley
+//                SendImage(image);
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+//
+//    public String getStringImage(Bitmap bmp) {
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//        byte[] imageBytes = baos.toByteArray();
+//        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+//        return encodedImage;
+//
+//    }
+//
+//    private void SendImage( final String image) {
+//        String url = "http://10.0.2.2:8080/csci201-fp-server/rest/file/image/upload/post/" + uniqueID +"/index/1";
+//        final StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        Log.d("uploaded", response);
+//                        try {
+//                            JSONObject jsonObject = new JSONObject(response);
+//
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        //Toast.makeText(Edit_Profile.this, "No internet connection", Toast.LENGTH_LONG).show();
+//
+//                    }
+//                })
+//        {
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//
+//                Map<String, String> params = new Hashtable<String, String>();
+//
+//                params.put("image", image);
+//                return params;
+//            }
+//        };
+//        queue.add(stringRequest);
+//
+//    }
+//
+//});
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri filePath = data.getData();
+
+            try {
+                //getting image from gallery
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                ImageView image = (ImageView) findViewById(R.id.uploadedImage);
+                //Setting image to ImageView
+                image.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+
+
+
+
+        }
