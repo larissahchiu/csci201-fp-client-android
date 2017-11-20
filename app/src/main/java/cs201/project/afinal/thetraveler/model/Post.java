@@ -16,6 +16,9 @@ public class Post implements Serializable {
     private String placeId;
     private String placeName;
     private String postContent;
+
+
+
     private int numImages;
     private boolean isPublic;
 
@@ -71,6 +74,9 @@ public class Post implements Serializable {
     public int getNumImages() {
         return numImages;
     }
+    public void setNumImages(int numImages) {
+        this.numImages = numImages;
+    }
     public boolean isPublic() {
         return isPublic;
     }
@@ -89,4 +95,5 @@ public class Post implements Serializable {
                 ", isPublic=" + isPublic +
                 '}';
     }
+
 }

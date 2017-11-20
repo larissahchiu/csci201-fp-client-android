@@ -1,6 +1,7 @@
 package cs201.project.afinal.thetraveler;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,12 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -106,8 +109,13 @@ public class TimelineFragment extends Fragment {
                                 post.setUserName(userName);
                                 post.setPlaceName(placeName);
                                 post.setPostContent(postContent);
+                                post.setId(jsonPost.getString("id"));
+                                post.setNumImages(jsonPost.getInt("numImages"));
+                                if(post.getId().equals("1DC62916-0D17-42BC-9848-BC5E43C8CE75")){
+                                    post.setNumImages(1);
+                                }
                                 allPosts.add(post);
-                                Log.e("TIMELINE FRAGMENT", post.toString());
+                                //Log.e("TIMELINE FRAGMENT", post.toString());
                             }
 
                             adapter.notifyDataSetChanged();
@@ -162,7 +170,55 @@ public class TimelineFragment extends Fragment {
             //get current in arraylist
             Post post = getItem(position);
 
-           TextView timelineCaption = (TextView) listViewItem.findViewById(R.id.timeline_post_caption);
+
+            final ImageView image = (ImageView) listViewItem.findViewById(R.id.timeline_post_image);
+            Log.e("timelinefragment", post.getPostContent() + post.getNumImages());
+
+            if(post.getNumImages() > 0){
+                String mImageURLString ="http://10.0.2.2:8080/csci201-fp-server/rest/file/image/download/post/" + post.getId() + "/index/1";
+                //Log.e("Profile Fragment", mImageURLString);
+//        // Initialize a new ImageRequest
+                //final ImageView mImageView = (ImageView) rootView.findViewById(R.id.profile_picture);
+                final String id = post.getId();
+                ImageRequest imageRequest = new ImageRequest(
+                        mImageURLString, // Image URL
+                        new Response.Listener<Bitmap>() { // Bitmap listener
+                            @Override
+                            public void onResponse(Bitmap response) {
+                                // Do something with response
+
+                                Log.e("timeline fragment", id);
+                                image.setImageBitmap(response);
+
+                            }
+                        },
+                        0, // Image width
+                        0, // Image height
+                        ImageView.ScaleType.CENTER_CROP, // Image scale type
+                        Bitmap.Config.RGB_565, //Image decode configuration
+                        new Response.ErrorListener() { // Error listener
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // Do something with error response
+                                error.printStackTrace();
+                                //Snackbar.make(mCLayout,"Error",Snackbar.LENGTH_LONG).show();
+                            }
+                        }
+                );
+
+
+
+                // Add ImageRequest to the RequestQueue
+                queue.add(imageRequest);
+
+            }
+            else{
+               image.setImageDrawable(getResources().getDrawable(R.drawable.sunrise_picture));
+            }
+
+
+
+            TextView timelineCaption = (TextView) listViewItem.findViewById(R.id.timeline_post_caption);
            TextView userName = (TextView) listViewItem.findViewById(R.id.timeline_user_name_text_view);
             TextView placeName = (TextView) listViewItem.findViewById(R.id.timeline_location_text_view);
             timelineCaption.setText(post.getPostContent());
