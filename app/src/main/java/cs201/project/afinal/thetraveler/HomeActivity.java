@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import cs201.project.afinal.thetraveler.model.User;
 
 
@@ -156,9 +158,11 @@ public class HomeActivity extends AppCompatActivity {
         mPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, PostActivity.class);
-                intent.putExtra("Title", "USC");
-                startActivity(intent);
+//                Intent intent = new Intent(HomeActivity.this, PostActivity.class);
+//                intent.putExtra("Title", "USC");
+//                startActivity(intent);
+                Toast.makeText(getBaseContext(), "Please go to explore page", Toast.LENGTH_SHORT).show();
+
             }
         });
 

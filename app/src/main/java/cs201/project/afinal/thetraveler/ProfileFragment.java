@@ -14,10 +14,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -69,7 +71,7 @@ public class ProfileFragment extends Fragment {
         allPosts = new ArrayList<Post>();
 
         // Inflate the layout for this fragment
-        View rootView =  inflater.inflate(R.layout.fragment_profile, container, false);
+        final View rootView =  inflater.inflate(R.layout.fragment_profile, container, false);
         TextView nameView = (TextView) rootView.findViewById(R.id.profile_user_name);
         nameView.setText(homeActivity.homeUser.getName());
 
@@ -87,6 +89,32 @@ public class ProfileFragment extends Fragment {
         String requestURL = "http://10.0.2.2:8080/csci201-fp-server/rest/timeline/user/"+ homeActivity.homeUser.getId() +
                 "/maxLength/1000";
         Log.e("Profile Fragment", requestURL);
+
+
+        String requestUrl = "http://10.0.2.2:8080/csci201-fp-server/rest/user/rank/id/" + homeActivity.homeUser.getId();
+
+        Log.e("HELLO", requestUrl);
+        StringRequest request2 = new StringRequest(Request.Method.GET, requestUrl
+                , new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("Home Fragment", response);
+
+                TextView rankTextView = (TextView) rootView.findViewById(R.id.profile_rank);
+                rankTextView.setText(response);
+
+            }
+
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+        queue.add(request2);
+
 
 
         getNumberOfPlaces(rootView, requestURL);

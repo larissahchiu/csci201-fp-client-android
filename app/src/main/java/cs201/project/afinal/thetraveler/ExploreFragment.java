@@ -70,6 +70,7 @@ public class ExploreFragment extends Fragment {
                                                 .position(new LatLng(lat, lng))
                                                 .title(title)
 
+
                                         );
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -90,16 +91,26 @@ public class ExploreFragment extends Fragment {
                                                                 Intent intent = new Intent(getActivity(), PostActivity.class);
                                                                 for(int i = 0; i < response.length(); i++){
                                                                    try{
+
                                                                        JSONObject place = (JSONObject) response.get(i);
-                                                                       if(marker.getTitle().equals(place.get("name"))){
-                                                                           intent.putExtra("Title", new Place(place.getString("id"),place.getString("name"),
-                                                                                   place.getDouble("lat"), place.getDouble("lon"), place.getInt("points"), place.getInt("numVisits")));
+                                                                       if(place.getString("name").equals(marker.getTitle())){
+                                                                           Bundle extras = new Bundle();
+                                                                           extras.putString("Title",marker.getTitle());
+                                                                           extras.putString("placeId", place.getString("id"));
+                                                                           Log.e("Explore Fragment", place.getString("id"));
+                                                                           intent.putExtras(extras);
                                                                        }
+
+
+//                                                                       if(marker.getTitle().equals(place.get("name"))){
+//                                                                           intent.putExtra("Title", new Place(place.getString("id"),place.getString("name"),
+//                                                                                   place.getDouble("lat"), place.getDouble("lon"), place.getInt("points"), place.getInt("numVisits")));
+//                                                                       }
                                                                    }catch (JSONException e) {
                                                                        e.printStackTrace();
                                                                    }
                                                                 }
-                                                                intent.putExtra("Title", marker.getTitle());
+                                                                //intent.putExtra("Title", marker.getTitle());
                                                                 startActivity(intent);
                                                             }
                                                 })

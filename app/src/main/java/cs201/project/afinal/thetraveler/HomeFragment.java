@@ -145,7 +145,7 @@ public class HomeFragment extends Fragment {
         requestUrl = "http://10.0.2.2:8080/csci201-fp-server/rest/user/rank/id/" + homeActivity.homeUser.getId();
 
         Log.e("HELLO", requestUrl);
-        Request request2 = new StringRequest(Request.Method.GET, requestUrl
+        StringRequest request2 = new StringRequest(Request.Method.GET, requestUrl
                 , new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -164,7 +164,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        queue.add(request);
+        queue.add(request2);
 
 
 

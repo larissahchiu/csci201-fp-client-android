@@ -39,4 +39,5 @@ dependencies {
     compile('com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-beta.4@aar') {
         transitive = true
     }
+    compile 'com.google.code.gson:gson:2.8.0'
 }
