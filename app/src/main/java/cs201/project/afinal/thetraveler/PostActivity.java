@@ -339,7 +339,7 @@ public class PostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }) {
 
@@ -353,6 +353,7 @@ public class PostActivity extends AppCompatActivity {
             public byte[] getBody() throws AuthFailureError {
 
                 //return requestBody == null ? null : requestBody.getBytes("utf-8");
+               // return bitmap.toString().getBytes();
                 return bitmap.toString().getBytes();
 
             }

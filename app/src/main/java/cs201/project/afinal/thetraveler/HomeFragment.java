@@ -44,16 +44,20 @@ public class HomeFragment extends Fragment {
     private HomeActivity homeActivity;
     private RequestQueue queue;
 
+    private int userChoice;
+
     public HomeFragment() {
         // Required empty public constructor
     }
 
 
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(HomeActivity homeActivity) {
+    public static HomeFragment newInstance(HomeActivity homeActivity, int choice) {
         Log.e("HomeFragment", "New Instance");
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
+        args.putInt(HomeActivity.SIGNUP_KEY, choice);
+
         fragment.homeActivity = homeActivity;
         fragment.setArguments(args);
         return fragment;
@@ -64,7 +68,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-
+            userChoice = getArguments().getInt(HomeActivity.SIGNUP_KEY, -1);
         }
     }
 
@@ -135,37 +139,39 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
 //        int points = SignupActivity.user.getScore();
 
-        TextView pointsTextView = (TextView) fragmentLayout.findViewById(R.id.home_points);
-        pointsTextView.setText(Integer.toString(homeActivity.homeUser.getScore()));
+        if(userChoice != 2) {
+            TextView pointsTextView = (TextView) fragmentLayout.findViewById(R.id.home_points);
+            pointsTextView.setText(Integer.toString(homeActivity.homeUser.getScore()));
 
-        String level = Integer.toString(homeActivity.homeUser.getScore() / 10 + 1);
-        TextView levelTextView = (TextView) fragmentLayout.findViewById(R.id.home_level);
-        levelTextView.setText(level);
+            String level = Integer.toString(homeActivity.homeUser.getScore() / 10 + 1);
+            TextView levelTextView = (TextView) fragmentLayout.findViewById(R.id.home_level);
+            levelTextView.setText(level);
 
-        requestUrl = "http://10.0.2.2:8080/csci201-fp-server/rest/user/rank/id/" + homeActivity.homeUser.getId();
+            requestUrl = "http://10.0.2.2:8080/csci201-fp-server/rest/user/rank/id/" + homeActivity.homeUser.getId();
 
-        Log.e("HELLO", requestUrl);
-        StringRequest request2 = new StringRequest(Request.Method.GET, requestUrl
-                , new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.e("Home Fragment", response);
+            Log.e("HELLO", requestUrl);
+            StringRequest request2 = new StringRequest(Request.Method.GET, requestUrl
+                    , new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.e("Home Fragment", response);
 
-                TextView rankTextView = (TextView) fragmentLayout.findViewById(R.id.home_ranking);
-                rankTextView.setText(response);
+                    TextView rankTextView = (TextView) fragmentLayout.findViewById(R.id.home_ranking);
+                    rankTextView.setText(response);
 
-            }
+                }
 
-        },
-        new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
 
-            }
-        });
+                        }
+                    });
 
-        queue.add(request2);
+            queue.add(request2);
 
+        }
 
 
 

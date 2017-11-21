@@ -108,7 +108,9 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
-                intent.putExtra("user", user);
+               // intent.putExtra("user", user);
+                //adds int to intent: signUp - 0
+                intent.putExtra(HomeActivity.SIGNUP_KEY, 2);
                 startActivity(intent);
             }
         });

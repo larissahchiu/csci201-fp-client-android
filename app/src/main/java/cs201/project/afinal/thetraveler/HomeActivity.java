@@ -22,6 +22,10 @@ import cs201.project.afinal.thetraveler.model.User;
 
 public class HomeActivity extends AppCompatActivity {
 
+    public static final String SIGNUP_KEY = "cs201.project.afinal.thetraveler.signup";
+
+    private int guest;
+
     //members
     private ImageButton mHomeButton;
     private TextView mHomeTextView;
@@ -47,7 +51,11 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         homeUser = (User) getIntent().getSerializableExtra("user");
-        Log.e("homeactivity", homeUser.getId());
+//        Log.e("homeactivity", homeUser.getId());
+
+        //user choice guest or not
+        Intent i = getIntent();
+        guest = i.getIntExtra(SIGNUP_KEY, -1);
 
 
         //show home if app just launched
@@ -56,7 +64,7 @@ public class HomeActivity extends AppCompatActivity {
 
         if (sampleFragment == null) {
             FragmentTransaction fragmentTransaction = fm.beginTransaction();
-            sampleFragment = HomeFragment.newInstance(this);
+            sampleFragment = HomeFragment.newInstance(this, guest);
 
             fragmentTransaction.add(R.id.fragment_container, sampleFragment);
             fragmentTransaction.commit();
@@ -96,7 +104,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft;
-                    HomeFragment fragment = HomeFragment.newInstance(HomeActivity.this);
+                    HomeFragment fragment = HomeFragment.newInstance(HomeActivity.this, guest);
 //                    Bundle bundle = new Bundle();
 //                    bundle.putString("homeUserName", homeUserName);
 //                    fragment.setArguments(bundle);
@@ -243,6 +251,11 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+
+        if(guest == 2) {
+            Toast.makeText(this, "Sign-up to unlock all of The Traveler's features!", Toast.LENGTH_SHORT).show();
+            guestUser();
+        }
     }
 
     public void deselectButtons() {
@@ -260,6 +273,12 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public void guestUser() {
+        mExploreButton.setEnabled(false);
+        mProfileButton.setEnabled(false);
+        mPostButton.setEnabled(false);
     }
 
 //
