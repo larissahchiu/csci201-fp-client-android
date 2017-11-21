@@ -1,18 +1,24 @@
 package cs201.project.afinal.thetraveler;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -79,12 +85,14 @@ public class PostActivity extends AppCompatActivity {
     private RequestQueue queue;
     private Bitmap bitmap;
 
+    String uniqueID;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.e("PostActivity", "made");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
-        final String uniqueID = UUID.randomUUID().toString();
+        uniqueID = UUID.randomUUID().toString();
 
         queue = Volley.newRequestQueue(this);
         User user = SignupActivity.user;
@@ -96,6 +104,7 @@ public class PostActivity extends AppCompatActivity {
         placeUSC = "";
         idUSC = "";
 
+        ImageView profile = (ImageView) findViewById(R.id.post_profile_picture);
 
 
         if(place.equals("USC")){
@@ -176,61 +185,6 @@ public class PostActivity extends AppCompatActivity {
         final String name = user.getName();
 
 
-        PICK_IMAGE_REQUEST = 1;
-        Button Upload = (Button)findViewById(R.id.uploadButton);
-        Upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_PICK);
-                startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
-                
-                final ProgressDialog progressDialog = new ProgressDialog(PostActivity.this);
-                progressDialog.setMessage("Uploading, please wait...");
-                progressDialog.show();
-
-                //converting image to base64 string
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] imageBytes = baos.toByteArray();
-                final String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-
-                String URL = "http://10.0.2.2:8080/csci201-fp-server/rest/file/image/upload/post/" + uniqueID + "/index/1";
-                //sending image to server
-                StringRequest request = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>(){
-                    @Override
-                    public void onResponse(String s) {
-                        progressDialog.dismiss();
-                        if(s.equals("true")){
-                            Toast.makeText(PostActivity.this, "Uploaded Successful", Toast.LENGTH_LONG).show();
-                        }
-                        else{
-                            Toast.makeText(PostActivity.this, "Some error occurred!", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                },new Response.ErrorListener(){
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(PostActivity.this, "Some error occurred -> "+volleyError, Toast.LENGTH_LONG).show();;
-                    }
-                }) {
-                    //adding parameters to send
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> parameters = new HashMap<String, String>();
-                        parameters.put("image", imageString);
-                        return parameters;
-                    }
-                };
-
-               // RequestQueue rQueue = Volley.newRequestQueue(PostActivity.this);
-                queue.add(request);
-            }
-        });
-
-
         mPostButton = (Button) findViewById(R.id.post_button);
         mPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -276,9 +230,6 @@ public class PostActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             Log.i("VOLLEY", response);
-
-
-
                             PostActivity.super.onBackPressed();
                         }
                     }, new Response.ErrorListener() {
@@ -313,103 +264,128 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
+        Button Upload = (Button)findViewById(R.id.uploadButton);
+        Upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //if everything is ok we will open image chooser
+                Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, 1);
+            }
+
+        });
+
 
     }
 
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        //onActivityResult(requestCode, resultCode, data);
-//        Log.e("Picture", "entered hello!r");
-//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-//            Log.e("Picture", "entered onActivityResult");
-//            Uri filePath = data.getData();
-//            try {
-//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-//                Bitmap lastBitmap = null;
-//                lastBitmap = bitmap;
-//                //encoding image to string
-//                String image = getStringImage(lastBitmap);
-//                Log.d("image",image);
-//                //passing the image to volley
-//                SendImage(image);
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-//
-//    public String getStringImage(Bitmap bmp) {
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//        byte[] imageBytes = baos.toByteArray();
-//        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-//        return encodedImage;
-//
-//    }
-//
-//    private void SendImage( final String image) {
-//        String url = "http://10.0.2.2:8080/csci201-fp-server/rest/file/image/upload/post/" + uniqueID +"/index/1";
-//        final StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        Log.d("uploaded", response);
-//                        try {
-//                            JSONObject jsonObject = new JSONObject(response);
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        //Toast.makeText(Edit_Profile.this, "No internet connection", Toast.LENGTH_LONG).show();
-//
-//                    }
-//                })
-//        {
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//
-//                Map<String, String> params = new Hashtable<String, String>();
-//
-//                params.put("image", image);
-//                return params;
-//            }
-//        };
-//        queue.add(stringRequest);
-//
-//    }
-//
-//});
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri filePath = data.getData();
-
+            //getting the image Uri
+            Uri imageUri = data.getData();
             try {
-                //getting image from gallery
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                ImageView image = (ImageView) findViewById(R.id.uploadedImage);
-                //Setting image to ImageView
-                image.setImageBitmap(bitmap);
-            } catch (Exception e) {
+                //getting bitmap object from uri
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                ImageView imageView = (ImageView) findViewById(R.id.uploadedImage);
+                //displaying selected image to imageview
+                imageView.setImageBitmap(bitmap);
+
+                //calling the method uploadBitmap to upload image
+                uploadBitmap(bitmap);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+        ImageView imageView = (ImageView) findViewById(R.id.uploadedImage);
+        //displaying selected image to imageview
+//        imageView.setImageDrawable(getResources(R.drawable.leavey);
+        //imageView.setImageResource(getResources().getIdentifier("res:drawable/leavey.jpg", null, null));
+        imageView.setImageResource(R.drawable.leavey);
+        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) imageView.getLayoutParams();
+        params.width = 100;
+        params.height = 100;
+        // existing height is ok as is, no need to edit it
+        imageView.setLayoutParams(params);
+
+        Drawable drawable = getResources().getDrawable(R.drawable.leavey);
+        Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
+
+        uploadBitmap(bitmap);
+    }
+
+    private void uploadBitmap(final Bitmap bitmap) {
+
+        //getting the tag from the edittext
+
+        String url = "http://10.0.2.2:8080/csci201-fp-server/rest/file/image/upload/post/" + uniqueID + "/index/1";
+        //our custom volley request
+       StringRequest volleyMultipartRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                            Log.e("PostActivity", response);
+                            //Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+
+            /*
+            * If you want to add more parameters with the image
+            * you can do it here
+            * here we have only one parameter with the image
+            * which is tags
+            * */
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+
+                //return requestBody == null ? null : requestBody.getBytes("utf-8");
+                return bitmap.toString().getBytes();
+
+            }
+
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                return params;
+            }
+
+            /*
+            * Here we are passing image by renaming it with a unique name
+            * */
+//            @Override
+//            protected Map<String, DataPart> getByteData() {
+//                Map<String, DataPart> params = new HashMap<>();
+//                long imagename = System.currentTimeMillis();
+//                params.put("pic", new DataPart(imagename + ".png", getFileDataFromDrawable(bitmap)));
+//                return params;
+//            }
+        };
+
+        //adding the request to volley
+       queue.add(volleyMultipartRequest);
+    }
+
+    public byte[] getFileDataFromDrawable(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
     }
 
 
 
-
-
-
-
-        }
+}
