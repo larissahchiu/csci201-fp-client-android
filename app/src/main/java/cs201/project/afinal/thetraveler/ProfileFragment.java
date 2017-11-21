@@ -239,7 +239,7 @@ public class ProfileFragment extends Fragment {
 
             }
             else{
-                image.setImageDrawable(getResources().getDrawable(R.drawable.sunrise_picture));
+                image.setImageDrawable(getResources().getDrawable(R.drawable.leavey));
             }
 
             TextView caption = (TextView) listViewItem.findViewById(R.id.profile_post_caption);

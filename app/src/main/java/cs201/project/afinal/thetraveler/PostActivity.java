@@ -36,6 +36,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -105,6 +106,34 @@ public class PostActivity extends AppCompatActivity {
         idUSC = "";
 
         ImageView profile = (ImageView) findViewById(R.id.post_profile_picture);
+
+        String mImageURLString ="http://10.0.2.2:8080/csci201-fp-server/rest/file/image/download/user/" +  user.getId();
+        ImageRequest imageRequest = new ImageRequest(
+                mImageURLString, // Image URL
+                new Response.Listener<Bitmap>() { // Bitmap listener
+                    @Override
+                    public void onResponse(Bitmap response) {
+                        // Do something with response
+
+                        ImageView mImageView = (ImageView) findViewById(R.id.post_profile_picture);
+                        mImageView.setImageBitmap(response);
+
+                    }
+                },
+                0, // Image width
+                0, // Image height
+                ImageView.ScaleType.CENTER_CROP, // Image scale type
+                Bitmap.Config.RGB_565, //Image decode configuration
+                new Response.ErrorListener() { // Error listener
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Do something with error response
+                        error.printStackTrace();
+                        //Snackbar.make(mCLayout,"Error",Snackbar.LENGTH_LONG).show();
+                    }
+                }
+        );
+
 
 
         if(place.equals("USC")){

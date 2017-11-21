@@ -213,7 +213,7 @@ public class TimelineFragment extends Fragment {
 
             }
             else{
-               image.setImageDrawable(getResources().getDrawable(R.drawable.sunrise_picture));
+               image.setImageDrawable(getResources().getDrawable(R.drawable.leavey));
             }
 
 
