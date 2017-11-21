@@ -96,4 +96,8 @@ public class Post implements Serializable {
                 '}';
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
 }

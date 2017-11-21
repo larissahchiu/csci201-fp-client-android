@@ -110,6 +110,7 @@ public class TimelineFragment extends Fragment {
                                 post.setPlaceName(placeName);
                                 post.setPostContent(postContent);
                                 post.setId(jsonPost.getString("id"));
+                                post.setUserId(jsonPost.getString("userId"));
                                 post.setNumImages(jsonPost.getInt("numImages"));
                                 if(post.getId().equals("1DC62916-0D17-42BC-9848-BC5E43C8CE75")){
                                     post.setNumImages(1);
@@ -171,17 +172,50 @@ public class TimelineFragment extends Fragment {
             Post post = getItem(position);
 
 
+            String mImageURLString ="http://10.0.2.2:8080/csci201-fp-server/rest/file/image/download/user/" +  post.getUserId();
+//        // Initialize a new ImageRequest
+            final ImageView mImageViewprofile = (ImageView) listViewItem.findViewById(R.id.timeline_profile_picture);
+
+            ImageRequest imageRequestprofile = new ImageRequest(
+                    mImageURLString, // Image URL
+                    new Response.Listener<Bitmap>() { // Bitmap listener
+                        @Override
+                        public void onResponse(Bitmap response) {
+                            // Do something with response
+                            mImageViewprofile.setImageBitmap(response);
+
+                        }
+                    },
+                    0, // Image width
+                    0, // Image height
+                    ImageView.ScaleType.CENTER_CROP, // Image scale type
+                    Bitmap.Config.RGB_565, //Image decode configuration
+                    new Response.ErrorListener() { // Error listener
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // Do something with error response
+                            error.printStackTrace();
+                            //Snackbar.make(mCLayout,"Error",Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+            );
+
+
+            // Add ImageRequest to the RequestQueue
+            queue.add(imageRequestprofile);
+
+
             final ImageView image = (ImageView) listViewItem.findViewById(R.id.timeline_post_image);
             Log.e("timelinefragment", post.getPostContent() + post.getNumImages());
 
             if(post.getNumImages() > 0){
-                String mImageURLString ="http://10.0.2.2:8080/csci201-fp-server/rest/file/image/download/post/" + post.getId() + "/index/1";
+                String mImageURLStrin ="http://10.0.2.2:8080/csci201-fp-server/rest/file/image/download/post/" + post.getId() + "/index/1";
                 //Log.e("Profile Fragment", mImageURLString);
 //        // Initialize a new ImageRequest
                 //final ImageView mImageView = (ImageView) rootView.findViewById(R.id.profile_picture);
                 final String id = post.getId();
                 ImageRequest imageRequest = new ImageRequest(
-                        mImageURLString, // Image URL
+                        mImageURLStrin, // Image URL
                         new Response.Listener<Bitmap>() { // Bitmap listener
                             @Override
                             public void onResponse(Bitmap response) {

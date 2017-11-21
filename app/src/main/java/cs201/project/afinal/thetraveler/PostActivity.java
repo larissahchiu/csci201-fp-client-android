@@ -105,9 +105,10 @@ public class PostActivity extends AppCompatActivity {
         placeUSC = "";
         idUSC = "";
 
-        ImageView profile = (ImageView) findViewById(R.id.post_profile_picture);
+        String mImageURLString ="http://10.0.2.2:8080/csci201-fp-server/rest/file/image/download/user/" + user.getId();
+//        // Initialize a new ImageRequest
+        final ImageView mImageView = (ImageView) findViewById(R.id.post_profile_picture);
 
-        String mImageURLString ="http://10.0.2.2:8080/csci201-fp-server/rest/file/image/download/user/" +  user.getId();
         ImageRequest imageRequest = new ImageRequest(
                 mImageURLString, // Image URL
                 new Response.Listener<Bitmap>() { // Bitmap listener
@@ -134,6 +135,7 @@ public class PostActivity extends AppCompatActivity {
                 }
         );
 
+        queue.add(imageRequest);
 
 
         if(place.equals("USC")){

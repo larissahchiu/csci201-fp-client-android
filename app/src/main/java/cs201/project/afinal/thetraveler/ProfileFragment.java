@@ -136,6 +136,7 @@ public class ProfileFragment extends Fragment {
                         // Do something with response
 
                         ImageView mImageView = (ImageView) rootView.findViewById(R.id.profile_picture);
+
                         mImageView.setImageBitmap(response);
 
                     }
